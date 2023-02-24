@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Heap Overload</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <link rel="icon" type="image/png" href="ho_logo_dark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@600&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        .content {
+            width: -webkit-fill-available;
+        }
+
+        .btn {
+            width: 200px;
+            text-align: left;
+        }
+
+        html, body, #sidebarMenu {
+            height: 100%;
+        }
+
+        body {
+            background-color: #fbfbfb;
+            font-family: 'League Spartan', sans-serif;
+
+        }
+        @media (min-width: 991.98px) {
+            main {
+                padding-left: 5px;
+            }
+        }
+
+        .sidebar {
+            top: 0;
+            bottom: 0;
+            left: 0;
+            padding: 1px 0 0;
+            box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%), 0 2px 10px 0 rgb(0 0 0 / 5%);
+            width: 200px;
+            z-index: 600;
+        }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                width: 100%;
+            }
+        }
+        .sidebar .active {
+            border-radius: 5px;
+            box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
+        }
+
+        .sidebar-sticky {
+            position: relative;
+            top: 0;
+            height: calc(100vh - 48px);
+            padding-top: 0.5rem;
+            overflow-x: hidden;
+            overflow-y: auto; 
+        }
+
+        .container-class {
+            display: flex;
+        }
+
+        .disc-item {
+           text-decoration: none; 
+        }
+
+/* roller styles */
+.slider{
+	height:10px;
+	position: relative;
+}
+
+.caption{
+	line-height: 155px;
+	color: #000000;
+	position: relative;
+	top: -5%;
+	transform: translateY(-50%);
+	/* text-shadow: 0px 3px 3px rgba(0,0,0,.25); */
+	/* margin-left: -300px; */
+}
+
+.text-box{
+	display: inline-block;
+	position: relative;
+}
+
+.text-box div{
+	display: inline-block;
+	position: absolute;
+	top: -200px;
+	transform: rotateX(-90deg);
+	opacity: 0;
+	/* text-shadow: 0px 3px 3px rgba(0,0,0,.25); */
+	animation-timing-function: ease;
+}
+
+.text-box div:nth-child(1){
+	animation: rollDown 7s forwards infinite;
+}
+
+.text-box div:nth-child(2){
+	animation: rollDown2 7s forwards infinite;
+}
+
+.text-box div:nth-child(3){
+	animation: rollDown3 7s forwards infinite;
+}
+
+@keyframes rollDown {
+	0%{
+		top: -100px;
+		transform: rotateX(-90deg);
+	}
+	11%{
+		top: -74px;
+		transform: rotateX(0deg);
+		opacity: 1;
+	}
+	22%{
+		top: -74px;
+		transform: rotateX(0deg);
+		opacity: 1;
+	}
+	33%{
+		top: 10px;
+		transform: rotateX(30deg);
+		opacity: 0;
+	}
+}
+
+@keyframes rollDown2 {
+	33%{
+		top: -100px;
+		transform: rotateX(-90deg);
+	}
+	44%{
+		top: -74px;
+		transform: rotateX(0deg);
+		opacity: 1;
+	}
+	55%{
+		top: -74px;
+		transform: rotateX(0deg);
+		opacity: 1;
+	}
+	66%{
+		top: 10px;
+		transform: rotateX(30deg);
+		opacity: 0;
+	}
+}
+
+@keyframes rollDown3 {
+	66%{
+		top: -100px;
+		transform: rotateX(-90deg);
+	}
+	77%{
+		top: -74px;
+		transform: rotateX(0deg);
+		opacity: 1;
+	}
+	88%{
+		top: -74px;
+		transform: rotateX(0deg);
+		opacity: 1;
+	}
+	99%{
+		top: 10px;
+		transform: rotateX(30deg);
+		opacity: 0;
+	}
+}
+
+@keyframes breathing {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.10);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.logo_animation {
+  animation: breathing 4s ease-in-out infinite;
+  margin: 15% 40%;
+}
+
+    </style>
+  </head>
+  <body>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+      crossorigin="anonymous"
+    ></script>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary bg-dark" data-bs-theme="dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#"><img src="ho_logo_dark.png" alt="heapoverload" style="float:left; margin-right: 10px; " height="30px" width="30px"> heapoverload.</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">About Us</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link active dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Blog
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="#">Something else here</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Contact us</a>
+            </li>   
+
+          <form class="d-flex" role="search">
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <button class="btn btn-outline-success btn-sm" type="submit" style="width: 80px;">
+              Search
+            </button>
+          </form>
+          <a href="login.html" type="a" class="btn btn-secondary mx-3" style="width: fit-content;">Log in</a>
+          <a href="signup.html" type="button" class="btn btn-outline-light" style="width: fit-content; ">Sign Up</a>
+        </div>
+        </div>
+    </nav>
+
+        <div class="container-class">
+            <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white w-25">
+              <div class="position-sticky">
+                <div class="list-group list-group-flush mx-3 mt-1">
+
+                  <ul id="collapseExample1" class="collapse show list-group list-group-flush">
+                      <li class="list-group-item py-1">
+                          <span href="#" class="text-dark">
+                            <h3>
+                          a place for
+                          <div class="slider">
+                            <div class="caption">
+                              <div class="text-box">
+                                <div>developers.</div>
+                                <div>creativity.</div>
+                                <div>collaboration.</div>
+                                <div>productivity.</div>
+                              </div>
+                            </div>
+                          </div>
+                          </h3>
+                          </span>
+                      </li>
+                      <li class="list-group-item py-1">
+                          <a href="index.html"><button type="button" class="btn btn-light mb-2">Home</button></a>
+                      </li>
+                      <li class="list-group-item py-1">
+                          <a href="#"><button type="button" id="questions" class="btn btn-light mb-2">Questions</button></a>
+                      </li>
+                      <li class="list-group-item py-1">
+                          <a href="#"><button type="button" id="mostans" class="btn btn-light mb-2">Most answered</button></a>
+                      </li>
+                      <li class="list-group-item py-1">
+                          <a href="#"><button type="button" class="btn btn-light mb-2">Unanswered</button></a>
+                      </li>
+                      <li class="list-group-item py-1">
+                          <a href="#"><button type="button" class="btn btn-light mb-2">Most visited</button></a>
+                      </li>
+                      <li class="list-group-item py-1">
+                          <a href="#"><button type="button" id="faqs" class="btn btn-light mb-2">FAQs</button></a>
+                      </li>
+                      <li class="list-group-item py-1">
+                          <a href="#"><button type="button" class="btn btn-light mb-2">Tags</button></a>
+                      </li>
+                      <li class="list-group-item py-1">
+                          <a href="#"><button type="button" id="user" class="btn btn-light mb-2">User</button></a>
+                      </li>
+                      <li class="list-group-item py-1">
+                        <a href="#"><button type="button" id="codingcontest" class="btn btn-light mb-5">Coding Contest</button></a>
+                      </li>
+                  </ul>
+                  
+                </div>
+              </div>
+            </nav> 
+         
+            <main class="content">
+                <div class="container">
+                  <img class= "logo_animation" src="ho_logo_light.png" alt="heapoverload_logo">
+                  <br>
+                  <h1 style="text-align: center;">Welcome to heapoverload.</h1>
+                </div>
+            </main>
+
+            <div class="sidebarMenu right mt-4 mx-2">
+                <div class="card">
+                    <div class="card-body">
+                        <button type="button" class="btn btn-secondary text-center">Ask a question</button>
+                    </div>
+                  </div>
+                  <div class="card mt-3">
+                    <div class="card-body">
+                        <span>Categories</span>
+                        <div class="dropdown mt-2">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              Select Category
+                            </button>
+                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item" href="#">Action</a></li>
+                              <li><a class="dropdown-item" href="#">Another action</a></li>
+                              <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            </ul>
+                          </div>
+                    </div>
+                  </div>
+                  <div class="card mt-3">
+                    <div class="card-body">
+                        <span>Top Discussions</span>
+                            <ul class="disc" style="list-style-type:disc">
+                              <li><a class="disc-item text-dark" href="#">The idea of how I will share my profile on social sites</a></li>
+                              <li><a class="disc-item text-dark" href="#">Discuss the rules for maintaining all the employees in the company</a></li>
+                              <li><a class="disc-item text-dark" href="#">The best way to choose between a job and a business</a></li>
+                              <li><a class="disc-item text-dark" href="#">Which is the most important UIUX in terms of design?</a></li>
+                            </ul>
+                          </div>
+                    </div>
+                  </div>
+            </div>
+        </div>
+  </body>
+</html>
+<script>
+
+  const questionsBtn = document.getElementById('questions');
+  const userBtn = document.getElementById('user');
+  const codingcontestBtn = document.getElementById('codingcontest');
+  const faqsBtn = document.getElementById('faqs');
+  const mostansBtn = document.getElementById('mostans');
+  const content = document.querySelector('.content');
+
+  const mostansContent = `
+    <p class="mb-1 mt-4 text-center fw-bold fs-2">Most Answered</p>
+  <div class="list-group">
+    <a href="#highlightedAnswer1collapse" data-mdb-toggle="collapse" aria-expanded="false"
+      aria-controls="highlightedAnswer1collapse" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">Question 1</h5>
+      </div>
+      <p class="mb-1">
+        Short & concise version of the answer.
+      </p>
+      <small><u>Learn more</u></small>
+      <!-- Collapsed content -->
+      <div class="collapse mt-3" id="highlightedAnswer1collapse">
+        Detailed and comprehensive answer goes here. pariatur cliche reprehenderit, enim eiusmod
+        high
+        life accusamus terry richardson ad
+        squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt
+        sapiente ea proident.
+      </div>
+    </a>
+    <a href="#highlightedAnswer2collapse" data-mdb-toggle="collapse" aria-expanded="false"
+      aria-controls="highlightedAnswer1collapse"
+      class="list-group-item list-group-item-action bg-info text-white border-0">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">Highlighted question?</h5>
+      </div>
+      <p class="mb-1">
+        Short & concise version of the answer.
+      </p>
+      <small class=" text-white"><u>Learn more</u></small>
+      <!-- Collapsed content -->
+      <div class="collapse mt-3" id="highlightedAnswer2collapse">
+        Detailed and comprehensive answer goes here. pariatur cliche reprehenderit, enim eiusmod
+        high
+        life accusamus terry richardson ad
+        squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt
+        sapiente ea proident.
+      </div>
+    </a>
+    <a href="#highlightedAnswer3collapse" data-mdb-toggle="collapse" aria-expanded="false"
+      aria-controls="highlightedAnswer1collapse" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">Question 3</h5>
+      </div>
+      <p class="mb-1">
+        Short & concise version of the answer.
+      </p>
+      <small class="text-muted"><u>Learn more</u></small>
+      <!-- Collapsed content -->
+      <div class="collapse mt-3" id="highlightedAnswer3collapse">
+        Detailed and comprehensive answer goes here. pariatur cliche reprehenderit, enim eiusmod
+        high
+        life accusamus terry richardson ad
+        squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt
+        sapiente ea proident.
+      </div>
+    </a>
+  </div>
+  `;
+
+  const faqsContent = `
+  <section>
+  <h3 class="text-center mb-4 pb-2 text-primary fw-bold">FAQ</h3>
+  <p class="text-center mb-5">
+    Find the answers for the most frequently asked questions below
+  </p>
+
+  <div class="row">
+    <div class="col-md-6 col-lg-4 mb-4">
+      <h6 class="mb-3 text-primary"><i class="far fa-paper-plane text-primary pe-2"></i> A simple
+        question?</h6>
+      <p>
+        <strong><u>Absolutely!</u></strong> We work with top payment companies which guarantees
+        your
+        safety and
+        security. All billing information is stored on our payment processing partner.
+      </p>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+      <h6 class="mb-3 text-primary"><i class="fas fa-pen-alt text-primary pe-2"></i> A question
+        that
+        is longer then the previous one?</h6>
+      <p>
+        <strong><u>Yes, it is possible!</u></strong> You can cancel your subscription anytime in
+        your
+        account. Once the subscription is
+        cancelled, you will not be charged next month.
+      </p>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+      <h6 class="mb-3 text-primary"><i class="fas fa-user text-primary pe-2"></i> A simple
+        question?
+      </h6>
+      <p>
+        Currently, we only offer monthly subscription. You can upgrade or cancel your monthly
+        account at any time with no further obligation.
+      </p>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+      <h6 class="mb-3 text-primary"><i class="fas fa-rocket text-primary pe-2"></i> A simple
+        question?
+      </h6>
+      <p>
+        Yes. Go to the billing section of your dashboard and update your payment information.
+      </p>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+      <h6 class="mb-3 text-primary"><i class="fas fa-home text-primary pe-2"></i> A simple
+        question?
+      </h6>
+      <p><strong><u>Unfortunately no</u>.</strong> We do not issue full or partial refunds for any
+        reason.</p>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+      <h6 class="mb-3 text-primary"><i class="fas fa-book-open text-primary pe-2"></i> Another
+        question that is longer than usual</h6>
+      <p>
+        Of course! We’re happy to offer a free plan to anyone who wants to try our service.
+      </p>
+    </div>
+  </div>
+</section>
+  `;
+
+  const questionsContent = `
+  <section class="question">
+      <div>
+        <form>
+          <div class="mb-3 mt-3 mx-2">
+            <input
+              type="text"
+              class="container form-control mx-auto my-2"
+              id="questionTtl"
+              placeholder="Enter your question title here"
+            />
+            <textarea
+              class="container form-control mx-auto my-2"
+              id="questionDsc"
+              placeholder="Enter your question description here"
+            ></textarea>
+            <input
+              type="file"
+              class="container form-control mx-auto my-2"
+              id="file"
+            />
+          </div>
+
+          <div class="container">
+            <center>
+              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="reset" class="btn btn-primary">Reset</button>
+            </center>
+          </div>
+        </form>
+      </div>
+
+      <div class="container">
+        <hr />
+        <h2 align="center" class="my-4">Answers</h2>
+        <div class="card my-2">
+          <div class="card-header">
+            <b>
+              I was confused as to why things are appearing outside the table,
+              before it, as opposed to inside the rows, where I was expecting
+              them. It turns out that all code inside of a table needs to be
+              inside of a &lt;td>:
+            </b>
+          </div>
+
+          <div class="card-body font-weight-bold">
+            <blockquote class="blockquote mb-0">
+              <p>
+                as noted: tables seem to require a specific hierarchy of
+                elements or must wrap the element for it to be rendered in the
+                expected position; otherwise the table will "cast it to the
+                top", so to speak.
+              </p>
+
+              <footer class="blockquote-footer mx-1 my-1">
+                Someone famous in
+                <cite title="Source Title">BVM CP Deparment(...)</cite>
+              </footer>
+            </blockquote>
+          </div>
+          <div class="container h3">
+            <i class="fa-solid fa-thumbs-up text-primary"></i>
+            <i class="fa fa-thumbs-down text-danger"></i>
+          </div>
+        </div>
+
+        <div class="card my-2">
+          <div class="card-header">
+            <b>
+              I was confused as to why things are appearing outside the table,
+              before it, as opposed to inside the rows, where I was expecting
+              them. It turns out that all code inside of a table needs to be
+              inside of a &lt;td>:
+            </b>
+          </div>
+
+          <div class="card-body font-weight-bold">
+            <blockquote class="blockquote mb-0">
+              <p>
+                as noted: tables seem to require a specific hierarchy of
+                elements or must wrap the element for it to be rendered in the
+                expected position; otherwise the table will "cast it to the
+                top", so to speak.
+              </p>
+
+              <footer class="blockquote-footer mx-1 my-1">
+                Someone famous in
+                <cite title="Source Title">BVM CP Deparment(...)</cite>
+              </footer>
+            </blockquote>
+          </div>
+          <div class="container h3">
+            <i class="fa fa-thumbs-up text-primary"></i>
+            <i class="fa fa-thumbs-down text-danger"></i>
+          </div>
+        </div>
+        <div class="card my-2">
+          <div class="card-header">
+            <b>
+              I was confused as to why things are appearing outside the table,
+              before it, as opposed to inside the rows, where I was expecting
+              them. It turns out that all code inside of a table needs to be
+              inside of a &lt;td>:
+            </b>
+          </div>
+
+          <div class="card-body font-weight-bold">
+            <blockquote class="blockquote mb-0">
+              <p>
+                as noted: tables seem to require a specific hierarchy of
+                elements or must wrap the element for it to be rendered in the
+                expected position; otherwise the table will "cast it to the
+                top", so to speak.
+              </p>
+
+              <footer class="blockquote-footer mx-1 my-1">
+                Someone famous in
+                <cite title="Source Title">BVM CP Deparment(...)</cite>
+              </footer>
+            </blockquote>
+          </div>
+          <div class="container h3">
+            <i class="fa fa-thumbs-up text-primary"></i>
+            <i class="fa fa-thumbs-down text-danger"></i>
+          </div>
+        </div>
+        <div class="card my-2">
+          <div class="card-header">
+            <b>
+              I was confused as to why things are appearing outside the table,
+              before it, as opposed to inside the rows, where I was expecting
+              them. It turns out that all code inside of a table needs to be
+              inside of a &lt;td>:
+            </b>
+          </div>
+
+          <div class="card-body font-weight-bold">
+            <blockquote class="blockquote mb-0">
+              <p>
+                as noted: tables seem to require a specific hierarchy of
+                elements or must wrap the element for it to be rendered in the
+                expected position; otherwise the table will "cast it to the
+                top", so to speak.
+              </p>
+
+              <footer class="blockquote-footer mx-1 my-1">
+                Someone famous in
+                <cite title="Source Title">BVM CP Deparment(...)</cite>
+              </footer>
+            </blockquote>
+          </div>
+          <div class="container h3">
+            <i class="fa fa-thumbs-up text-primary"></i>
+            <i class="fa fa-thumbs-down text-danger"></i>
+          </div>
+        </div>
+        <div class="card my-2">
+          <div class="card-header">
+            <b>
+              I was confused as to why things are appearing outside the table,
+              before it, as opposed to inside the rows, where I was expecting
+              them. It turns out that all code inside of a table needs to be
+              inside of a &lt;td>:
+            </b>
+          </div>
+
+          <div class="card-body font-weight-bold">
+            <blockquote class="blockquote mb-0">
+              <p>
+                as noted: tables seem to require a specific hierarchy of
+                elements or must wrap the element for it to be rendered in the
+                expected position; otherwise the table will "cast it to the
+                top", so to speak.
+              </p>
+
+              <footer class="blockquote-footer mx-1 my-1">
+                Someone famous in
+                <cite title="Source Title">BVM CP Deparment(...)</cite>
+              </footer>
+            </blockquote>
+          </div>
+          <div class="container h3">
+            <i class="fa fa-thumbs-up text-primary"></i>
+            <i class="fa fa-thumbs-down text-danger"></i>
+          </div>
+        </div>
+        <div class="card my-2">
+          <div class="card-header">
+            <b>
+              I was confused as to why things are appearing outside the table,
+              before it, as opposed to inside the rows, where I was expecting
+              them. It turns out that all code inside of a table needs to be
+              inside of a &lt;td>:
+            </b>
+          </div>
+
+          <div class="card-body font-weight-bold">
+            <blockquote class="blockquote mb-0">
+              <p>
+                as noted: tables seem to require a specific hierarchy of
+                elements or must wrap the element for it to be rendered in the
+                expected position; otherwise the table will "cast it to the
+                top", so to speak.
+              </p>
+
+              <footer class="blockquote-footer mx-1 my-1">
+                Someone famous in
+                <cite title="Source Title">BVM CP Deparment(...)</cite>
+              </footer>
+            </blockquote>
+          </div>
+          <div class="container h3">
+            <i class="fa fa-thumbs-up text-primary"></i>
+            <i class="fa fa-thumbs-down text-danger"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+  const userContent = ` 
+   <section class="profile">
+      <section style="background-color: #eee">
+        <div class="container py-1">
+          <h2 align="center" class="my-5">My profile</h2>
+          <div class="row">
+            <div class="col-lg-4">
+              <div class="card mb-4">
+                <div class="card-body text-center">
+                  <img
+                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+                    alt="avatar"
+                    class="rounded-circle img-fluid"
+                    style="width: 150px"
+                  />
+                  <h5 class="my-3">John Smith</h5>
+                  <p class="text-muted mb-1">Full Stack Developer</p>
+
+                  <div class="d-flex justify-content-center mb-2">
+                    <button type="button" class="btn btn-primary">
+                      Follow
+                    </button>
+                    <button type="button" class="btn btn-outline-primary ms-1">
+                      Message
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="card mb-4 mb-lg-0">
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush rounded-3">
+                    <li
+                      class="list-group-item d-flex justify-content-between align-items-center p-3"
+                    >
+                      <i class="fas fa-globe fa-lg text-warning"></i>
+                      <p class="mb-0">website</p>
+                    </li>
+                    <li
+                      class="list-group-item d-flex justify-content-between align-items-center p-3"
+                    >
+                      <i class="fab fa-github fa-lg" style="color: #333333"></i>
+                      <p class="mb-0">github</p>
+                    </li>
+                    <li
+                      class="list-group-item d-flex justify-content-between align-items-center p-3"
+                    >
+                      <i
+                        class="fab fa-twitter fa-lg"
+                        style="color: #55acee"
+                      ></i>
+                      <p class="mb-0">twitter</p>
+                    </li>
+                    <li
+                      class="list-group-item d-flex justify-content-between align-items-center p-3"
+                    >
+                      <i
+                        class="fab fa-instagram fa-lg"
+                        style="color: #ac2bac"
+                      ></i>
+                      <p class="mb-0">instagram</p>
+                    </li>
+                    <li
+                      class="list-group-item d-flex justify-content-between align-items-center p-3"
+                    >
+                      <i
+                        class="fab fa-facebook-f fa-lg"
+                        style="color: #3b5998"
+                      ></i>
+                      <p class="mb-0">facebook</p>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-8">
+              <div class="card mb-4">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <p class="mb-0">Full Name</p>
+                    </div>
+                    <div class="col-sm-9">
+                      <p class="text-muted mb-0">Johnatan Smith</p>
+                    </div>
+                  </div>
+                  <hr />
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <p class="mb-0">Email</p>
+                    </div>
+                    <div class="col-sm-9">
+                      <p class="text-muted mb-0">example@example.com</p>
+                    </div>
+                  </div>
+                  <hr />
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <p class="mb-0">Working at</p>
+                    </div>
+                    <div class="col-sm-9">
+                      <p class="text-muted mb-0">OpenAI</p>
+                    </div>
+                  </div>
+                  <hr />
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <p class="mb-0">Role</p>
+                    </div>
+                    <div class="col-sm-9">
+                      <p class="text-muted mb-0">Project Manager</p>
+                    </div>
+                  </div>
+                  <hr />
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <p class="mb-0">Accuracy</p>
+                    </div>
+                    <div class="col-sm-9">
+                      <p class="text-muted mb-0">96%</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card mb-4 mb-md-0">
+                    <div class="card-body">
+                      <p class="mb-4">
+                        <span class="text-primary font-italic me-1"
+                          >Expertise</span
+                        >
+                      </p>
+                      <p class="mb-1" style="font-size: 0.77rem">JavaScript</p>
+                      <div class="progress rounded" style="height: 5px">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 80%"
+                          aria-valuenow="80"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                      <p class="mt-4 mb-1" style="font-size: 0.77rem">Kotlin</p>
+                      <div class="progress rounded" style="height: 5px">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 72%"
+                          aria-valuenow="72"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                      <p class="mt-4 mb-1" style="font-size: 0.77rem">React</p>
+                      <div class="progress rounded" style="height: 5px">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 89%"
+                          aria-valuenow="89"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                      <p class="mt-4 mb-1" style="font-size: 0.77rem">PHP</p>
+                      <div class="progress rounded" style="height: 5px">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 55%"
+                          aria-valuenow="55"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                      <p class="mt-4 mb-1" style="font-size: 0.77rem">
+                        Backend API
+                      </p>
+                      <div class="progress rounded mb-2" style="height: 5px">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 66%"
+                          aria-valuenow="66"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card mb-4 mb-md-0">
+                    <div class="card-body">
+                      <p class="mb-4">
+                        <span class="text-primary font-italic me-1"
+                          >assigment</span
+                        >
+                        Project Status
+                      </p>
+                      <p class="mb-1" style="font-size: 0.77rem">Web Design</p>
+                      <div class="progress rounded" style="height: 5px">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 80%"
+                          aria-valuenow="80"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                      <p class="mt-4 mb-1" style="font-size: 0.77rem">
+                        Website Markup
+                      </p>
+                      <div class="progress rounded" style="height: 5px">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 72%"
+                          aria-valuenow="72"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                      <p class="mt-4 mb-1" style="font-size: 0.77rem">
+                        One Page
+                      </p>
+                      <div class="progress rounded" style="height: 5px">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 89%"
+                          aria-valuenow="89"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                      <p class="mt-4 mb-1" style="font-size: 0.77rem">
+                        Mobile Template
+                      </p>
+                      <div class="progress rounded" style="height: 5px">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 55%"
+                          aria-valuenow="55"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                      <p class="mt-4 mb-1" style="font-size: 0.77rem">
+                        Backend API
+                      </p>
+                      <div class="progress rounded mb-2" style="height: 5px">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          style="width: 66%"
+                          aria-valuenow="66"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>`
+  const codingcontestContent = `
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Coding Contests</title>
+</head>
+<body>
+    <section class="text-gray-600 body-font overflow-hidden">
+        <div class="container px-5 py-24 mx-auto">
+          <div class="flex flex-wrap -m-12">
+            <div class="p-12 md:w-1/2 flex flex-col items-start">
+              <span class="inline-block py-1 px-2 rounded bg-indigo-50 text-indigo-500 text-xs font-medium tracking-widest">C++</span>
+              <h2 class="sm:text-3xl text-2xl title-font font-medium text-gray-900 mt-4 mb-4">Google Hash Code</h2>
+              <p class="leading-relaxed mb-8">A C++ coding contest is an event where participants compete against each other to solve a set of programming problems using the C++ programming language. These contests are typically organized by universities, tech companies, and programming organizations and are held either online or on-site. The contest is usually timed, with participants given a limited amount of time to solve as many problems as they can. The winner of the contest is typically determined by the number of problems solved correctly within the given time frame.</p>
+              <div class="flex items-center flex-wrap pb-4 mb-4 border-b-2 border-gray-100 mt-auto w-full">
+                <a class="text-indigo-500 inline-flex items-center">Enroll Now
+                  <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
+                  </svg>
+                </a>
+                <span class="text-gray-400 mr-3 inline-flex items-center ml-auto leading-none text-sm pr-3 py-1 border-r-2 border-gray-200">
+                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>1.2K
+                </span>
+                <span class="text-gray-400 inline-flex items-center leading-none text-sm">
+                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>
+                  </svg>6
+                </span>
+              </div>
+              <a class="inline-flex items-center">
+                <img alt="blog" src="https://dummyimage.com/104x104" class="w-12 h-12 rounded-full flex-shrink-0 object-cover object-center">
+                <span class="flex-grow flex flex-col pl-4">
+                  <span class="title-font font-medium text-gray-900">Google Inc</span>
+                  <span class="text-gray-400 text-xs tracking-widest mt-0.5">C++ DEVELOPER</span>
+                </span>
+              </a>
+            </div>
+            <div class="p-12 md:w-1/2 flex flex-col items-start">
+              <span class="inline-block py-1 px-2 rounded bg-indigo-50 text-indigo-500 text-xs font-medium tracking-widest">Al and ML</span>
+              <h2 class="sm:text-3xl text-2xl title-font font-medium text-gray-900 mt-4 mb-4">Facebook Hacker Cup</h2>
+              <p class="leading-relaxed mb-8">AI/ML coding contests provide a platform for participants to showcase their skills in the field, learn new techniques and algorithms, and collaborate with other AI/ML enthusiasts. They can also be a great way to build connections in the tech industry and advance one's career in AI and ML.</p>
+              <div class="flex items-center flex-wrap pb-4 mb-4 border-b-2 border-gray-100 mt-auto w-full">
+                <a class="text-indigo-500 inline-flex items-center">Enroll No
+                  <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
+                  </svg>
+                </a>
+                <span class="text-gray-400 mr-3 inline-flex items-center ml-auto leading-none text-sm pr-3 py-1 border-r-2 border-gray-200">
+                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>2.2K
+                </span>
+                <span class="text-gray-400 inline-flex items-center leading-none text-sm">
+                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>
+                  </svg>6
+                </span>
+              </div>
+              <a class="inline-flex items-center">
+                <img alt="blog" src="https://dummyimage.com/103x103" class="w-12 h-12 rounded-full flex-shrink-0 object-cover object-center">
+                <span class="flex-grow flex flex-col pl-4">
+                  <span class="title-font font-medium text-gray-900">Facebook Inc</span>
+                  <span class="text-gray-400 text-xs tracking-widest mt-0.5">Core Team</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="text-gray-600 body-font overflow-hidden">
+        <div class="container px-5 py-24 mx-auto">
+          <div class="flex flex-wrap -m-12">
+            <div class="p-12 md:w-1/2 flex flex-col items-start">
+              <span class="inline-block py-1 px-2 rounded bg-indigo-50 text-indigo-500 text-xs font-medium tracking-widest">React.js</span>
+              <h2 class="sm:text-3xl text-2xl title-font font-medium text-gray-900 mt-4 mb-4">Microsoft Imagine Cup</h2>
+              <p class="leading-relaxed mb-8">React.js coding contests provide a platform for participants to showcase their skills in web development and learn new techniques and best practices for building user interfaces and applications with React.js. They can also be a great way to network with other web developers and advance one's career in the tech industry.</p>
+              <div class="flex items-center flex-wrap pb-4 mb-4 border-b-2 border-gray-100 mt-auto w-full">
+                <a class="text-indigo-500 inline-flex items-center">Enroll Now
+                  <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
+                  </svg>
+                </a>
+                <span class="text-gray-400 mr-3 inline-flex items-center ml-auto leading-none text-sm pr-3 py-1 border-r-2 border-gray-200">
+                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>1.1K
+                </span>
+                <span class="text-gray-400 inline-flex items-center leading-none text-sm">
+                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>
+                  </svg>6
+                </span>
+              </div>
+              <a class="inline-flex items-center">
+                <img alt="blog" src="https://dummyimage.com/104x104" class="w-12 h-12 rounded-full flex-shrink-0 object-cover object-center">
+                <span class="flex-grow flex flex-col pl-4">
+                  <span class="title-font font-medium text-gray-900">Microsoft Inc</span>
+                  <span class="text-gray-400 text-xs tracking-widest mt-0.5">Microsoft Team</span>
+                </span>
+              </a>
+            </div>
+            <div class="p-12 md:w-1/2 flex flex-col items-start">
+              <span class="inline-block py-1 px-2 rounded bg-indigo-50 text-indigo-500 text-xs font-medium tracking-widest">PHP</span>
+              <h2 class="sm:text-3xl text-2xl title-font font-medium text-gray-900 mt-4 mb-4">ACM International Collegiate Programming Contest (ICPC)</h2>
+              <p class="leading-relaxed mb-8">PHP coding contests provide a platform for participants to showcase their skills in web development and learn new techniques and best practices for building dynamic web applications with PHP. They can also be a great way to network with other web developers and advance one's career in the tech industry.
+
+              </p>
+              <div class="flex items-center flex-wrap pb-4 mb-4 border-b-2 border-gray-100 mt-auto w-full">
+                <a class="text-indigo-500 inline-flex items-center">Enroll No
+                  <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
+                  </svg>
+                </a>
+                <span class="text-gray-400 mr-3 inline-flex items-center ml-auto leading-none text-sm pr-3 py-1 border-r-2 border-gray-200">
+                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>5.6K
+                </span>
+                <span class="text-gray-400 inline-flex items-center leading-none text-sm">
+                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>
+                  </svg>6
+                </span>
+              </div>
+              <a class="inline-flex items-center">
+                <img alt="blog" src="https://dummyimage.com/103x103" class="w-12 h-12 rounded-full flex-shrink-0 object-cover object-center">
+                <span class="flex-grow flex flex-col pl-4">
+                  <span class="title-font font-medium text-gray-900">ACM Inc</span>
+                  <span class="text-gray-400 text-xs tracking-widest mt-0.5">Core Team</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+</body>
+</html>`
+  questionsBtn.addEventListener('click', function() {
+    content.innerHTML = questionsContent;
+  });
+  userBtn.addEventListener('click', function() {
+    content.innerHTML = userContent;
+  });
+  faqsBtn.addEventListener('click', function() {
+    content.innerHTML = faqsContent;
+  });
+  mostansBtn.addEventListener('click', function() {
+    content.innerHTML = mostansContent;
+  });
+  codingcontestBtn.addEventListener('click', function() {
+    content.innerHTML = codingcontestContent;
+  });
+</script>
